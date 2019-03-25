@@ -1,0 +1,5 @@
+name: opencv-env-kenji
+dependencies:
+- python
+- matplotlib
+- opencv
