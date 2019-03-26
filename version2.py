@@ -1,5 +1,9 @@
 import cv2
 import numpy as np
+import matplotlib
+from sys import platform as sys_pf
+if sys_pf == 'darwin': # source: https://github.com/MTG/sms-tools/issues/36 
+    matplotlib.use("TkAgg")
 from matplotlib import pyplot as plt
 
 # note : read this paper: https://ieeexplore.ieee.org/document/5565062
