@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
+# note : read this paper: https://ieeexplore.ieee.org/document/5565062
+
 maxDisparity = 100
 disparityThreshold = 4
 
@@ -40,6 +42,7 @@ def calculateDisparityMap(imageL, imageR):
         #     plt.show()
 
     depth = np.ones(shifts.shape) - (shifts / maxDisparity)
+    # depth = cv2.GaussianBlur(depth,(3,3),0)
 
     # #### OPENCV Included Version #####
     # imgL = cv2.imread('im0.png',0)
@@ -82,17 +85,17 @@ if __name__ == "__main__":
     plt.imshow(depth)
     plt.show()
     
-    # cv2.imshow('Focuser', imL)
-    # cv2.setMouseCallback('Focuser', focus, [imL, depth])
+    cv2.imshow('Focuser', imL)
+    cv2.setMouseCallback('Focuser', focus, [imL, depth])
 
-    # while(True):
-    #     k = cv2.waitKey(1) & 0xFF
-    #     if k == ord('q'):
-    #         break
-    #     if k == ord('r'):
-    #         cv2.imshow('Focuser', imL)
+    while(True):
+        k = cv2.waitKey(1) & 0xFF
+        if k == ord('q'):
+            break
+        if k == ord('r'):
+            cv2.imshow('Focuser', imL)
     
-    # cv2.destroyAllWindows()
+    cv2.destroyAllWindows()
 
     # RGB_imL = cv2.cvtColor(imL, cv2.COLOR_BGR2RGB)
     # RGB_imgR = cv2.cvtColor(imgR, cv2.COLOR_BGR2RGB)
