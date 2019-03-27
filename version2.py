@@ -13,6 +13,8 @@ disparityThreshold = 4
 
 maxKernel = 8 # for blurring
 
+window = (3, 5) # for windowing
+
 def colorDifference(imageL, imageR):
     disparityBGR = imageL.astype(np.int16) - imageR
     return np.linalg.norm(disparityBGR, axis=-1)
@@ -28,25 +30,16 @@ def calculateDisparityMap(imageL, imageR):
     for i in range(maxDisparity):
         imgL = cv2.copyMakeBorder(imL,0,0,i,maxDisparity - i,cv2.BORDER_CONSTANT)
         disparity = colorDifference(imgR, imgL)
-        # compare to minDisparities, make sure to compare via subtraction
+        # compare to minDisparities
         cropped = disparity[:,i:imL.shape[1]+i]
-        # print(minDisparities.shape)
+        cropped = cv2.GaussianBlur(cropped, window, 0)
+
         mask = cropped <= minDisparities
         minDisparities[mask] = cropped[mask]
         shifts[mask] = i
-        
-        # print(disparity)
-        # print(np.min(disparity))
-        # break
-        
-        # if i== 70:
-        #     RGB_disparity = cv2.cvtColor(disparityBGR.astype(np.uint8), cv2.COLOR_BGR2RGB)
-        #     RGB_imgL = cv2.cvtColor(imgL, cv2.COLOR_BGR2RGB)
-        #     plt.imshow(RGB_imgL)
-        #     plt.show()
 
+        
     depth = np.ones(shifts.shape) - (shifts / maxDisparity)
-    # depth = cv2.GaussianBlur(depth,(3,3),0)
 
     # #### OPENCV Included Version #####
     # imgL = cv2.imread('im0.png',0)
@@ -75,8 +68,6 @@ def focus(event, x, y, flags, param):
             blurs = cv2.GaussianBlur(img,(kernel,kernel),0)
             blurredImg[kernelSize==kernel] = blurs[kernelSize==kernel]
         cv2.imshow('Focuser', blurredImg)
-
-
 
 # Pipeline
 if __name__ == "__main__":
