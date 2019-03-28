@@ -37,7 +37,6 @@ def calculateDisparityMap(imageL, imageR):
         mask = cropped <= minDisparities
         minDisparities[mask] = cropped[mask]
         shifts[mask] = i
-
         
     depth = np.ones(shifts.shape) - (shifts / maxDisparity)
 
@@ -76,6 +75,8 @@ if __name__ == "__main__":
     imL = cv2.imread("im0.png")
     imR = cv2.imread("im1.png")
 
+    # TODO: calibration here
+
     depth = calculateDisparityMap(imL, imR)
     plt.imshow(depth)
     plt.show()
@@ -91,23 +92,3 @@ if __name__ == "__main__":
             cv2.imshow('Focuser', imL)
     
     cv2.destroyAllWindows()
-
-    # RGB_imL = cv2.cvtColor(imL, cv2.COLOR_BGR2RGB)
-    # RGB_imgR = cv2.cvtColor(imgR, cv2.COLOR_BGR2RGB)
-    # plt.imshow(RGB_imL)
-    # plt.show()
-    # imgL = cv2.imread("im0.png", 0)
-    # imgR = cv2.imread("im1.png", 0)
-    # stereo = cv2.StereoBM_create(numDisparities=32, blockSize=15)
-    # disparity = stereo.compute(imgL,imgR)
-    # plt.imshow(disparity,'gray')
-    # plt.show()
-
-    # calibrate
-    # e = calibrate(imL, imR)
-    # # this allows us to calculate the epipolar lines between images
-    # # choose correspondences
-    # # later change this to use some window size...
-    # calculateCorrespondences(imL, imR, e)
-    
-    # calculate distances
