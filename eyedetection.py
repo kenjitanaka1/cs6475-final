@@ -1,7 +1,6 @@
 import math
 import cv2
 import numpy as np
-from scipy import ndimage
 from utils import load_data
 from keras.models import Sequential, load_model
 from keras.layers import Convolution2D, MaxPooling2D, Dropout, Flatten, Dense
@@ -11,32 +10,10 @@ import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 # http://mccormickml.com/2014/01/10/stereo-vision-tutorial-part-i/
+# http://graphics.stanford.edu/papers/portrait/wadhwa-portrait-sig18.pdf
+# https://www.eecis.udel.edu/~jye/lab_research/11/cgi11.pdf
 
 # Eye detection and tracking in image with complex background 
-
-# Gaussian mixture model for human skin color and its applications
-# in image and video databases
-
-# https://ieeexplore.ieee.org/document/982883
-
-# # face detection thresholds
-# # file:///Users/kenjitanaka/Downloads/Face_Detection_Using_Color_Thresholding_and_Eigeni.pdf
-
-# def bgr_to_ycbcr(img):
-#     y = 0.257 * img[:,:,2] + 0.504 * img[:,:,1] + 0.098 * img[:,:,0] + 16
-#     cb = 0.148 * img[:,:,2] - 0.291 * img[:,:,1] + 0.439 * img[:,:,0] + 128
-#     cr = 0.439 * img[:,:,2] - 0.368 * img[:,:,1] - 0.071 * img[:,:,0] + 128
-#     return np.stack((y, cb, cr), axis=-1)
-
-# def get_hessian(mat):
-#     Ix = cv2.Sobel(mat * 1.,cv2.CV_64F,1,0,ksize=3)
-#     Iy = cv2.Sobel(mat * 1.,cv2.CV_64F,0,1,ksize=3)
-#     Ixx = cv2.Sobel(Ix,cv2.CV_64F,1,0,ksize=3)
-#     Ixy = cv2.Sobel(Ix,cv2.CV_64F,0,1,ksize=3)
-#     Iyy = cv2.Sobel(Iy,cv2.CV_64F,0,1,ksize=3)
-#     Ixy2 = Ixy * Ixy
-#     H = Ixx * Ixy - Ixy2
-#     return H
 
 def calc_dispmap(imageL, imageR, boxSize=(9,9), windowWidth = 100):
 
@@ -54,9 +31,6 @@ def calc_dispmap(imageL, imageR, boxSize=(9,9), windowWidth = 100):
         mask = (disparities < minDisparities)
         dists[mask] = shift
         minDisparities[mask] = disparities[mask] * 0.99
-
-    # experimental = sobelize(imageL)
-    # dists = cv2.GaussianBlur(dists,(3,3),0).astype(np.int16)
 
     dists = cv2.resize(dists, (imageL.shape[1], imageL.shape[0]))
     dists = (np.abs(dists)) / (windowWidth /2.)
@@ -114,7 +88,6 @@ def get_my_CNN_model_architecture():
 # hist = model.fit(X_train, y_train, epochs=100, batch_size=200, verbose=1, validation_split=0.2)
 # model.save('my_model.h5')
 
-# dist = lambda x, y : math.sqrt((x[0] - y[0]) **2 + (x[1] - y[1]))
 model = load_model('my_model.h5')
 # Face cascade to detect faces
 
@@ -129,7 +102,6 @@ if __name__ == "__main__":
     imgR = cv2.cvtColor(imR, cv2.COLOR_BGR2GRAY)
 
     face_cascade = cv2.CascadeClassifier('data/haarcascade_frontalface_default.xml')
-    # eye_cascade = cv2.CascadeClassifier('data/haarcascade_eye.xml')
     facesL = face_cascade.detectMultiScale(imgL, 1.3, 5)
     facesR = face_cascade.detectMultiScale(imgR, 1.3, 5)
 
@@ -175,10 +147,6 @@ if __name__ == "__main__":
 
         cv2.circle(image_with_detectionsR, (int(kpxL), int(kpyL)), 2, (0,255,0), 3)
         cv2.circle(image_with_detectionsR, (int(kpxR), int(kpyR)), 2, (0,255,0), 3)
-    # cv2.imshow('Focuser',image_with_detectionsL)
-    # cv2.waitKey(0)
-    # print(eyesL)
-    # print(eyesR)
 
     patchesL = [imL[int(eyeL[1])-4:int(eyeL[1])+4,int(eyeL[0])-4:int(eyeL[0])+4,:].astype(float) for eyeL in eyesL]
     patchesR = [imR[int(eyeR[1])-4:int(eyeR[1])+4,int(eyeR[0])-4:int(eyeR[0])+4,:].astype(float) for eyeR in eyesR]
@@ -201,24 +169,12 @@ if __name__ == "__main__":
         cv2.line(stacked, (int(eyeL[0]), int(eyeL[1])), (int(eyesR[eyeMatch[i]][0] + image_with_detectionsL.shape[1]), int(eyesR[eyeMatch[i]][1])), (255, 255, 0), thickness=1)
         cv2.line(stacked, (int(eyeL[2]), int(eyeL[3])), (int(eyesR[eyeMatch[i]][2] + image_with_detectionsL.shape[1]), int(eyesR[eyeMatch[i]][3])), (0, 255, 255), thickness=1)
 
-    # test2 = np.copy(imL).astype(float) /255.
-    # for i in range(len(eyeMatch)):
-    #     eyeL = eyesL[i]
-    #     eyeR = eyesR[eyeMatch[i]]
-        
-    #     diffX = (eyeL[0] - eyeR[0] + eyeL[2] - eyeR[2]) / 2
-    #     diffY = (eyeL[1] - eyeR[1] + eyeL[3] - eyeR[3]) / 2
-    #     # print((diffX, diffY))
-    #     M = np.float32([[1,0,round(diffX)],[0,1,round(diffY)]])
-    #     rows,cols=imgR.shape
-    #     imR2 = cv2.warpAffine(imR,M,(cols,rows), borderMode=cv2.BORDER_REPLICATE)
-    #     test2 = np.copy(imL).astype(float) /255. + imR2.astype(float)/255.
-    #     test2 /= 2
-    #     # cv2.imshow('test2', test2)
-    #     # cv2.waitKey(0)
-
-    diff = calc_dispmap(imL, imR)
-    diff -= diff[int(eyesL[0][0]), int(eyesL[0][1])]
+    dists = calc_dispmap(imL, imR)
+    diff = dists - dists[int(eyesL[0][0]), int(eyesL[0][1])]
+    for eyeL in eyesL[1:]:
+        diffTest = dists - dists[int(eyeL[0]), int(eyeL[1])]
+        mask = diffTest < diff
+        diff[mask] = diffTest[mask]
     diff = np.abs(diff)
     diff = cv2.GaussianBlur(diff,(5,5),0) * 2
     # apply blur
@@ -232,5 +188,5 @@ if __name__ == "__main__":
         blurs = cv2.GaussianBlur(imL,(kernel,kernel),0)
         blurredImg[kernelSize==kernel] = blurs[kernelSize==kernel]
     cv2.imshow('Focuser', blurredImg)
-    cv2.imshow('diff', diff)
+    # cv2.imshow('diff', diff)
     cv2.waitKey(0)
