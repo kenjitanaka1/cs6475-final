@@ -6,7 +6,6 @@ dependencies:
 - matplotlib
 - opencv
 - cyvlfeat
-- joblib
 - numpy
 - scikit-learn
 - scikit-image
