@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 from time import time
 import facedetection
-# import os
+import os
 # os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 # http://www.merl.com/publications/docs/TR2004-043.pdf viola jones
@@ -57,15 +57,16 @@ if __name__ == "__main__":
     imgL = cv2.cvtColor(imL, cv2.COLOR_BGR2GRAY)
     imgR = cv2.cvtColor(imR, cv2.COLOR_BGR2GRAY)
 
-    if True: # need to train model
+    if not os.path.exists('model.joblib'): # need to train model
         facedetection.trainDetector()
+    facesL = facedetection.detectFacesMultiScale(imL, 1.3, 5)
         # images = lfw_subset()
         # # For speed, only extract the two first types of features
         # feature_types = ['type-2-x', 'type-2-y']
 
 
-    face_cascade = cv2.CascadeClassifier('data/haarcascade_frontalface_default.xml')
-    facesL = face_cascade.detectMultiScale(imgL, 1.3, 5)
+    # face_cascade = cv2.CascadeClassifier('data/haarcascade_frontalface_default.xml')
+    # facesL = face_cascade.detectMultiScale(imgL, 1.3, 5)
  
     dists = calc_dispmap(imL, imR)
 
