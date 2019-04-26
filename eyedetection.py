@@ -2,9 +2,9 @@ import math
 import cv2
 import numpy as np
 from utils import load_data
-from keras.models import Sequential, load_model
-from keras.layers import Convolution2D, MaxPooling2D, Dropout, Flatten, Dense
-from keras.optimizers import SGD, RMSprop, Adagrad, Adadelta, Adam, Adamax, Nadam
+# from keras.models import Sequential, load_model
+# from keras.layers import Convolution2D, MaxPooling2D, Dropout, Flatten, Dense
+# from keras.optimizers import SGD, RMSprop, Adagrad, Adadelta, Adam, Adamax, Nadam
 import time
 import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
@@ -12,6 +12,8 @@ os.environ['KMP_DUPLICATE_LIB_OK']='True'
 # http://mccormickml.com/2014/01/10/stereo-vision-tutorial-part-i/
 # http://graphics.stanford.edu/papers/portrait/wadhwa-portrait-sig18.pdf
 # https://www.eecis.udel.edu/~jye/lab_research/11/cgi11.pdf
+# https://www.researchgate.net/profile/Reinhard_Klette/publication/277476495_Bokeh_Effects_Based_on_Stereo_Vision/links/5607576d08aea25fce399a25.pdf
+
 
 # Eye detection and tracking in image with complex background 
 
