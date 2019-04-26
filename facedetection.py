@@ -7,6 +7,7 @@ import random
 import math
 import numpy as np
 import cyvlfeat as vlfeat
+from joblib import dump, load
 
 
 classifier = AdaBoostClassifier()
@@ -54,21 +55,8 @@ def trainDetector():
 
     classifier.fit(X, y)
 
+    dump(classifier, 'model.joblib') 
 
-    # # the label to predict is the id of the person
-    # y = lfw_people.target
-    # target_names = lfw_people.target_names
-    # n_classes = target_names.shape[0]
-
-    # print("Total dataset size:")
-    # print("n_samples: %d" % n_samples)
-    # print("n_features: %d" % n_features)
-    # print("n_classes: %d" % n_classes)
-
-    # X = lfw_people.data
-    # # classifier.fit(X, y)
-    
-    pass
 
 def detectFacesMultiScale():
     pass

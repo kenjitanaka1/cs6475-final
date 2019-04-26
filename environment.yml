@@ -6,3 +6,4 @@ dependencies:
 - matplotlib
 - opencv
 - cyvlfeat
+- joblib
