@@ -19,9 +19,6 @@ def bgr_to_ycbcr(img):
 
 classifier = AdaBoostClassifier(n_estimators=200,algorithm='SAMME.R', random_state=16)
 
-# http://www.robots.ox.ac.uk/~vgg/data3.html
-# http://ijettjournal.org/2016/volume-31/number-4/IJETT-V31P236.pdf
-
 # src : https://stackoverflow.com/questions/34325879/how-to-efficiently-find-clusters-of-like-elements-in-a-multidimensional-array 
 def find_clusters(array):
     clustered = np.empty_like(array)

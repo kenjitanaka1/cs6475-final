@@ -4,15 +4,7 @@ import numpy as np
 from time import time
 import facedetection
 import os
-# os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
-# http://www.merl.com/publications/docs/TR2004-043.pdf viola jones
-# https://ahprojects.com/hyperface/
-# http://mccormickml.com/2014/01/10/stereo-vision-tutorial-part-i/
-# http://graphics.stanford.edu/papers/portrait/wadhwa-portrait-sig18.pdf
-# https://www.eecis.udel.edu/~jye/lab_research/11/cgi11.pdf
-# https://www.researchgate.net/profile/Reinhard_Klette/publication/277476495_Bokeh_Effects_Based_on_Stereo_Vision/links/5607576d08aea25fce399a25.pdf
-# http://ijettjournal.org/2016/volume-31/number-4/IJETT-V31P236.pdf
 def calc_dispmap(imageL, imageR, boxSize=(9,9), windowWidth = 100):
 
     imBlurL = cv2.GaussianBlur(cv2.resize(imageL, None, fx=0.5, fy=0.5),(9,9),0).astype(np.int16)
