@@ -1,5 +1,8 @@
 name: opencv-env-kenji
+channels:
+- menpo
 dependencies:
 - python
 - matplotlib
 - opencv
+- cyvlfeat

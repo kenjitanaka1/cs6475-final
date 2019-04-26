@@ -2,15 +2,7 @@ import math
 import cv2
 import numpy as np
 from time import time
-from dask import delayed, threaded, multiprocessing
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_auc_score
-from skimage.data import lfw_subset
-from skimage.transform import integral_image
-from skimage.feature import haar_like_feature
-from skimage.feature import haar_like_feature_coord
-from skimage.feature import draw_haar_like_feature
+import facedetection
 # import os
 # os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
@@ -24,13 +16,13 @@ from skimage.feature import draw_haar_like_feature
 
 # Eye detection and tracking in image with complex background 
 
-@delayed
-def extract_feature_image(img, feature_type, feature_coord=None):
-    """Extract the haar feature for the current image"""
-    ii = integral_image(img)
-    return haar_like_feature(ii, 0, 0, ii.shape[0], ii.shape[1],
-                             feature_type=feature_type,
-                             feature_coord=feature_coord)
+# @delayed
+# def extract_feature_image(img, feature_type, feature_coord=None):
+#     """Extract the haar feature for the current image"""
+#     ii = integral_image(img)
+#     return haar_like_feature(ii, 0, 0, ii.shape[0], ii.shape[1],
+#                              feature_type=feature_type,
+#                              feature_coord=feature_coord)
 
 def calc_dispmap(imageL, imageR, boxSize=(9,9), windowWidth = 100):
 
@@ -66,25 +58,11 @@ if __name__ == "__main__":
     imgR = cv2.cvtColor(imR, cv2.COLOR_BGR2GRAY)
 
     if True: # need to train model
-        images = lfw_subset()
-        # For speed, only extract the two first types of features
-        feature_types = ['type-2-x', 'type-2-y']
+        facedetection.trainDetector()
+        # images = lfw_subset()
+        # # For speed, only extract the two first types of features
+        # feature_types = ['type-2-x', 'type-2-y']
 
-        # Build a computation graph using dask. This allows using multiple CPUs for
-        # the computation step
-        X = delayed(extract_feature_image(img, feature_types) for img in images)
-        # Compute the result using the "multiprocessing" dask backend
-        t_start = time()
-        X = np.array(X.compute(scheduler='threads'))
-        time_full_feature_comp = time() - t_start
-        y = np.array([1] * 100 + [0] * 100)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=150, random_state=0, stratify=y)
-
-        # Extract all possible features to be able to select the most salient.
-        feature_coord, feature_type = \
-                haar_like_feature_coord(width=images.shape[2], height=images.shape[1], feature_type=feature_types)
-    
-    print('done')
 
     face_cascade = cv2.CascadeClassifier('data/haarcascade_frontalface_default.xml')
     facesL = face_cascade.detectMultiScale(imgL, 1.3, 5)
