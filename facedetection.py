@@ -9,15 +9,11 @@ import time
 from skimage.morphology import watershed
 from skimage.feature import peak_local_max
 
-N_REGIONS = 2
-
 def bgr_to_ycbcr(img):
     y = 0.257 * img[:,:,2] + 0.504 * img[:,:,1] + 0.098 * img[:,:,0] + 16
     cb = 0.148 * img[:,:,2] - 0.291 * img[:,:,1] + 0.439 * img[:,:,0] + 128
     cr = 0.439 * img[:,:,2] - 0.368 * img[:,:,1] - 0.071 * img[:,:,0] + 128
     return y, cb, cr
-
-classifier = AdaBoostClassifier(n_estimators=200,algorithm='SAMME.R', random_state=16)
 
 # src : https://stackoverflow.com/questions/34325879/how-to-efficiently-find-clusters-of-like-elements-in-a-multidimensional-array 
 def find_clusters(array):
