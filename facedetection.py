@@ -24,8 +24,6 @@ def bgr_to_ycbcr(img):
     cr = 0.439 * img[:,:,2] - 0.368 * img[:,:,1] - 0.071 * img[:,:,0] + 128
     return y, cb, cr
 
-
-
 classifier = AdaBoostClassifier(n_estimators=200,algorithm='SAMME.R', random_state=16)
 
 # http://www.robots.ox.ac.uk/~vgg/data3.html
@@ -97,8 +95,6 @@ def detectFacesMultiScale(image, scale=1.3, skip=5):
 
     
     clusters, cluster_count = find_clusters(skinMask)
-    print("Found {} clusters.".format(cluster_count))
-    # print(clusters)
 
     drawn = image.copy()
 
@@ -106,18 +102,13 @@ def detectFacesMultiScale(image, scale=1.3, skip=5):
     cluster_sizes = ndimage.sum(ones, labels=clusters, index=range(cluster_count)).astype(int)
     com = ndimage.center_of_mass(ones, labels=clusters, index=range(cluster_count))
 
-    # largeClusters = cluster_sizes > 50000
-    print(clusters)
-
     faces = []
 
     for i, (size, center) in enumerate(zip(cluster_sizes, com)):
         if size < 250000 and size > 1000:
-            print("Cluster #{}: {} elements at {}".format(i, size, center))
             truths = clusters==i
 
             horz = np.sum(truths, axis=0)
-            print(horz.shape)
             horz= horz.nonzero()
             vert = np.sum(truths,axis=1)
             vert = vert.nonzero()
@@ -127,8 +118,5 @@ def detectFacesMultiScale(image, scale=1.3, skip=5):
             w = horz[0][-1] - x
             h = vert[0][-1] - y
 
-            cv2.rectangle(drawn, (x, y), (x + w, y+h), (255, 0, 255), 3)
             faces.append((x,y,w,h))
-    cv2.imshow('drawn',drawn)
-    cv2.waitKey(0)
     return faces

@@ -12,18 +12,7 @@ import os
 # http://graphics.stanford.edu/papers/portrait/wadhwa-portrait-sig18.pdf
 # https://www.eecis.udel.edu/~jye/lab_research/11/cgi11.pdf
 # https://www.researchgate.net/profile/Reinhard_Klette/publication/277476495_Bokeh_Effects_Based_on_Stereo_Vision/links/5607576d08aea25fce399a25.pdf
-
-
-# Eye detection and tracking in image with complex background 
-
-# @delayed
-# def extract_feature_image(img, feature_type, feature_coord=None):
-#     """Extract the haar feature for the current image"""
-#     ii = integral_image(img)
-#     return haar_like_feature(ii, 0, 0, ii.shape[0], ii.shape[1],
-#                              feature_type=feature_type,
-#                              feature_coord=feature_coord)
-
+# http://ijettjournal.org/2016/volume-31/number-4/IJETT-V31P236.pdf
 def calc_dispmap(imageL, imageR, boxSize=(9,9), windowWidth = 100):
 
     imBlurL = cv2.GaussianBlur(cv2.resize(imageL, None, fx=0.5, fy=0.5),(9,9),0).astype(np.int16)
@@ -50,7 +39,6 @@ if __name__ == "__main__":
     # note: BGR color, opencv default
     imL = cv2.imread("frame0.png")
     imR = cv2.imread("frame1.png")
-    # imgL = bgr_to_ycbcr(imL)
     headMask = cv2.imread("headShape.png", 0)
     headSum = np.sum(headMask)
 
@@ -60,22 +48,21 @@ if __name__ == "__main__":
     if not os.path.exists('model.joblib'): # need to train model
         facedetection.trainDetector()
     facesL = facedetection.detectFacesMultiScale(imL, 1.3, 5)
-        # images = lfw_subset()
-        # # For speed, only extract the two first types of features
-        # feature_types = ['type-2-x', 'type-2-y']
-
 
     # face_cascade = cv2.CascadeClassifier('data/haarcascade_frontalface_default.xml')
     # facesL = face_cascade.detectMultiScale(imgL, 1.3, 5)
  
     dists = calc_dispmap(imL, imR)
-
+    facesImage = imL.copy()
     headDists = []
     for (x,y,w,h) in facesL:
         cropped = imgL[y:y+h,x:x+w]
         scaled = cv2.resize(cropped, (96, 96)) / 255.
         scaled *= headMask
         headDists.append(np.sum(scaled)/ headSum)
+        cv2.rectangle(facesImage, (x, y), (x + w, y+h), (255, 0, 255), 3)
+
+    cv2.imwrite('faces.png',facesImage)
 
     diff = dists - headDists[0]
     for headDist in headDists[1:]:
@@ -85,8 +72,9 @@ if __name__ == "__main__":
     diff = np.abs(diff)
     diff = cv2.GaussianBlur(diff,(5,5),0) * 2
 
-    cv2.imshow('didf',diff)
-    cv2.waitKey(0)
+    # cv2.imshow('diff',diff)
+    cv2.imwrite('difference.png', diff * 255)
+    # cv2.waitKey(0)
         
     # apply blur
     maxKernel = 14
@@ -99,5 +87,6 @@ if __name__ == "__main__":
         blurs = cv2.GaussianBlur(imL,(kernel,kernel),0)
         blurredImg[kernelSize==kernel] = blurs[kernelSize==kernel]
     cv2.imshow('Focuser', blurredImg)
+    cv2.imwrite('output.png', blurredImg)
     # cv2.imshow('diff', diff)
     cv2.waitKey(0)
